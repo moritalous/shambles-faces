@@ -72,7 +72,9 @@ def lambda_handler(event, context):
     bounding_box = list(map(lambda x: x['BoundingBox'], response['FaceDetails']))
 
     l1 = list(range(len(bounding_box)))
-    l2 = random.sample(l1, len(l1))
+    # l2 = random.sample(l1, len(l1))
+    l2 = l1[1:]
+    l2.append(l1[0])
 
     for index in l1:
         (w, h, l, t) = absolute_position(width, height, bounding_box[index])
