@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  python3.9
+
+  Template for shambles-faces
+
+# More info about Globals: https://github.com/awslabs/serverless-application-model/blob/master/docs/globals.rst
+Globals:
+  Function:
+    Timeout: 30
+    MemorySize: 128
+
+Resources:
+  ShamblesFacesFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      PackageType: Image
+      Architectures:
+      - x86_64
+      # Events:
+      #   ShamblesFaces:
+      #     Type: Api # More info about API Event Source: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#api
+      #     Properties:
+      #       Path: /shamblesfaces
+      #       Method: post
+      FunctionUrlConfig:
+        AuthType: NONE
+        Cors:
+          AllowHeaders:
+            - '*'
+          AllowMethods: 
+            - '*'
+          AllowOrigins: 
+            - http://localhost:3000
+            - https://moritalous.pages.dev
+      Policies:
+        - AmazonRekognitionReadOnlyAccess
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./shambles_faces
+      DockerTag: python3.9-v1
+
+Outputs:
+  # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
+  # Find out more about other implicit resources you can reference within SAM
+  # https://github.com/awslabs/serverless-application-model/blob/master/docs/internals/generated_resources.rst#api
+  # ShamblesFacesApi:
+  #   Description: API Gateway endpoint URL for Prod stage for Hello World function
+  #   Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/shambles_faces/"
+  ShamblesFacesFunction:
+    Description: Shambles Faces Lambda Function ARN
+    Value: !GetAtt ShamblesFacesFunction.Arn
+  ShamblesFacesFunctionIamRole:
+    Description: Implicit IAM Role created for Shambles Faces function
+    Value: !GetAtt ShamblesFacesFunctionRole.Arn
+  ShamblesFacesFunctionUrl:
+    Description: Shambles Faces Lambda Function URL
+    Value: !GetAtt ShamblesFacesFunctionUrl.FunctionUrl
