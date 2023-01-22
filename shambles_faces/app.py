@@ -7,7 +7,7 @@ import boto3
 
 
 def load_input_image(img_bin):
-    img_array = np.frombuffer(img_bin,dtype=np.uint8)
+    img_array = np.frombuffer(img_bin, dtype=np.uint8)
     img = cv2.imdecode(img_array, cv2.IMREAD_COLOR)
 
     return img
@@ -51,8 +51,7 @@ def lambda_handler(event, context):
 
     img_bin = base64.b64decode(event['body'])
 
-
-    ### Rekognition
+    # Rekognition
     client = boto3.client('rekognition')
     response = client.detect_faces(
         Image={
@@ -63,13 +62,13 @@ def lambda_handler(event, context):
         ]
     )
 
-
-    ## Shambles
+    # Shambles
     img_input = load_input_image(img_bin)
     height, width, channels = img_input.shape[:3]
     img_output = img_input.copy()
 
-    bounding_box = list(map(lambda x: x['BoundingBox'], response['FaceDetails']))
+    bounding_box = list(
+        map(lambda x: x['BoundingBox'], response['FaceDetails']))
 
     l1 = list(range(len(bounding_box)))
     # l2 = random.sample(l1, len(l1))
@@ -80,15 +79,19 @@ def lambda_handler(event, context):
         (w, h, l, t) = absolute_position(width, height, bounding_box[index])
         clop = img_input[t: t + h, l: l + w]
 
-        (w, h, l, t) = absolute_position(width, height, bounding_box[l2[index]])
+        (w, h, l, t) = absolute_position(
+            width, height, bounding_box[l2[index]])
         clop = cv2.resize(clop, (w, h))
 
         img_output[t: t + h, l: l + w] = clop
 
-    ## 
+    ##
 
     return {
         "statusCode": 200,
+        "headers": {
+            "content-type": 'image/jpeg'
+        },
         "body": convet_base64(img_output),
         "isBase64Encoded": True
     }
